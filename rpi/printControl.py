@@ -11,6 +11,8 @@ from utils import (
                    setup,
                    doMove,
                    )
+import pickle
+import os
     
 #Printer Setup
 ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200)
@@ -55,6 +57,16 @@ for coordIn in range(1,(mLocs.shape[0])):
                         (time.perf_counter()-tstart)]
     
 print(df)
+cwd = os.getcwd()
+measNum = 1
 
+if os.path.isdir(os.path.join(cwd,'measTimeandLoc')):
+    df.to_csv(os.path.join(cwd,'measTimeandLoc',("meas"+str(measNum))))
+              
+else:
+    os.mkdir(os.path.join(cwd,'measTimeandLoc'))
+    df.to_csv(os.path.join(cwd,'measTimeandLoc',("meas"+str(measNum))))
+    
+              
 
 
