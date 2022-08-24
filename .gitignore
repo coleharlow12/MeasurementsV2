@@ -1,0 +1,19 @@
+# Mac storage files
+.DS_Store
+
+#Virtual Environment folder
+/venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pal file storage
+*.pkl
+
+#Weights storage
+*.tar
+
+# Prevents NHANES data being uploaded
+*.txt
