@@ -3,12 +3,13 @@ import time
 import serial
 import pandas as pd
 import numpy as np
-import RPi.GPIO as GPIO
+import gpiozero
+from signal import pause
 from utils import (
                    checkOk,
                    genPoints,
                    setup,
-                   doMove
+                   doMove,
                    )
     
 #Printer Setup
@@ -27,11 +28,23 @@ cols = ['x coord','y coord','z coord','time']
 df = pd.DataFrame(index=range(mLocs.shape[0]),columns=cols)
 
 # Move to First Measurement Point
-doMove(ser=ser,GPIOcoords=mLocs[0,:],xSpeed=maxX,zSpeed=maxZ)
+doMove(ser=ser,coords=mLocs[0,:],xSpeed=maxX,zSpeed=maxZ)
 df.iloc[0,:] = [mLocs[0,0],mLocs[0,1],mLocs[0,2],(0)]
 
 # Set variables for measurement
 restTime = 3000*1e-6 #Time in us to wait
+
+# Setup GPIO input and output
+INTERRUPTPIN = 2 #Used to initiate the interrupt
+TRIGGERPIN = 3 #Used to trigger the mmWaveRadar
+
+button = gpiozero.Button(INTERRUPTPIN)
+led = gpiozero.LED(TRIGGERPIN)
+led.off
+
+button.wait_for_press()
+ 
+led.on    
 tstart = time.perf_counter()
 
 for coordIn in range(1,(mLocs.shape[0])):
@@ -43,20 +56,5 @@ for coordIn in range(1,(mLocs.shape[0])):
     
 print(df)
 
-# Serial Pin Setup
 
-#while True:
-    #Waiting for interrupt
-    
-#Interrupt Function
-    #Move to First Measurement Point
-    
-    #Start Chirping and start timer
-    
-    #Wait Specified Time for x chirps to pass
-    
-    #Move
-    
-    #Wai Specified time
-    
-    #Repeats
+

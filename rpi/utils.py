@@ -1,6 +1,7 @@
 import sys
 import time
 import numpy as np
+import pandas as pd
 
 #Set max printer speed
 def setup(ser,max_XSpeed,max_ZSpeed):
@@ -68,5 +69,4 @@ def isDone(ser):
     checkOk(ser)
     return(0)
 
-#Save Current Time to files
 
