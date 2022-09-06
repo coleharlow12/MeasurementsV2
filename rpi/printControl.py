@@ -17,8 +17,8 @@ import os
 #Printer Setup
 ser = serial.Serial(port='/dev/ttyACM0', baudrate=115200)
 
-maxX = 25 #mm/s
-maxZ = 25 #mm/s
+maxX = 35 #mm/s
+maxZ = 35 #mm/s
 
 setup(ser,maxX,maxZ)
 
@@ -34,39 +34,37 @@ doMove(ser=ser,coords=mLocs[0,:],xSpeed=maxX,zSpeed=maxZ)
 df.iloc[0,:] = [mLocs[0,0],mLocs[0,1],mLocs[0,2],(0)]
 
 # Set variables for measurement
-restTime = 3000*1e-6 #Time in us to wait
+restTime = 8000*1e-6 #Time in us to wait
 
-# Setup GPIO input and output
-INTERRUPTPIN = 2 #Used to initiate the interrupt
 TRIGGERPIN = 3 #Used to trigger the mmWaveRadar
 
-button = gpiozero.Button(INTERRUPTPIN)
 led = gpiozero.LED(TRIGGERPIN)
 led.off
 
-button.wait_for_press()
- 
-led.on    
-tstart = time.perf_counter()
+txt = input('Init Complete. Continue? ')
+if txt=='yes':
+    # Starts the measurements of the radar
+    led.on    
+    tstart = time.perf_counter()
 
-for coordIn in range(1,(mLocs.shape[0])):
-    time.sleep(restTime)
-    # Move to the First Measurement Location
-    doMove(ser=ser,coords=mLocs[coordIn,:],xSpeed=maxX,zSpeed=maxZ)
-    df.iloc[coordIn,:]=[mLocs[coordIn,0],mLocs[coordIn,1],mLocs[coordIn,2],
-                        (time.perf_counter()-tstart)]
-    
-print(df)
-cwd = os.getcwd()
-measNum = 1
+    for coordIn in range(1,(mLocs.shape[0])):
+        time.sleep(restTime)
+        # Move to the First Measurement Location
+        doMove(ser=ser,coords=mLocs[coordIn,:],xSpeed=maxX,zSpeed=maxZ)
+        df.iloc[coordIn,:]=[mLocs[coordIn,0],mLocs[coordIn,1],mLocs[coordIn,2],
+                            (time.perf_counter()-tstart)]
+        
+    print(df)
+    cwd = os.getcwd()
+    measNum = 1
 
-if os.path.isdir(os.path.join(cwd,'measTimeandLoc')):
-    df.to_csv(os.path.join(cwd,'measTimeandLoc',("meas"+str(measNum))))
-              
-else:
-    os.mkdir(os.path.join(cwd,'measTimeandLoc'))
-    df.to_csv(os.path.join(cwd,'measTimeandLoc',("meas"+str(measNum))))
-    
+    if os.path.isdir(os.path.join(cwd,'measTimeandLoc')):
+        df.to_csv(os.path.join(cwd,'measTimeandLoc',("meas"+str(measNum))))
+                  
+    else:
+        os.mkdir(os.path.join(cwd,'measTimeandLoc'))
+        df.to_csv(os.path.join(cwd,'measTimeandLoc',("meas"+str(measNum))))
+        
               
 
 
